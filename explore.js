@@ -5,29 +5,33 @@ var peripheralId = process.argv[2];
 var gData;
 
 noble.on("discover", function(peripheral) {
-	//console.log("I saw peripheral with Uuid: " + peripheral.uuid);
+	console.log("I saw peripheral with Uuid: " + peripheral.uuid);
 	peripherals[peripheral.uuid] = peripheral;
 	
 	if (peripheral.uuid == peripheralId) {
-		//console.log("I found the device you told me to find");
+		console.log("I found the device you told me to find");
 		noble.stopScanning();
 		discoverDevice(peripheral.uuid);
 	}
 });
 
 function handleData(data) {
-	//console.log("Some notification data came in!");
-	//console.log(data);
-	//console.log(data[01]);
-	weight = ((data[02] * 255) + data[1]) * 100;
+	console.log("Some notification data came in!");
+	console.log(data);
+
+	//get some data out of the buffer and convert it into an integer.
+	//The buffer should basically be reversed [there are also start and stop bytes at both ends]
+	//Bytes at 2 and 1 are the bytes we actually care about
+	
+	weight = ((data[02] * 256) + data[1]) * 100;
 	lbs = weight * 0.0022046
 	console.log("Your weight in lbs is: " + lbs);
 	scan();
 }
 
 function discoverDevice(peripheralUuid) {
-	//console.log("Discovering device " + peripheralUuid);
-	//console.log("First connecting to device...");
+	console.log("Discovering device " + peripheralUuid);
+	console.log("First connecting to device...");
 	device = peripherals[peripheralUuid];
 
 	device.connect(function(error) {
